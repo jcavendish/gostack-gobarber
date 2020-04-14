@@ -1,5 +1,6 @@
 import { startOfHour } from 'date-fns';
 
+import { getCustomRepository } from 'typeorm';
 import Appointment from '../models/Appointment';
 import AppointmentsRepository from '../repositories/AppointmentsRepository';
 
@@ -9,22 +10,19 @@ interface RequestDTO {
 }
 
 class CreateAppointmentService {
-  repository: AppointmentsRepository;
-
-  constructor(repository: AppointmentsRepository) {
-    this.repository = repository;
-  }
-
-  public execute({ provider, date }: RequestDTO): Appointment {
+  public async execute({ provider, date }: RequestDTO): Promise<Appointment> {
     const appointmentDate = startOfHour(date);
-    const conflictingAppointment = this.repository.findByDate(appointmentDate);
+    const repository = getCustomRepository(AppointmentsRepository);
+    const conflictingAppointment = await repository.findByDate(appointmentDate);
 
     if (conflictingAppointment) {
       throw Error(
         'The time of this appointment is not available. Please try another time.'
       );
     }
-    return this.repository.create({ provider, date: appointmentDate });
+    const appointment = repository.create({ provider, date: appointmentDate });
+    await repository.save(appointment);
+    return appointment;
   }
 }
 
