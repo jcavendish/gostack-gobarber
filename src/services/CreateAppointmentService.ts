@@ -5,22 +5,29 @@ import Appointment from '../models/Appointment';
 import AppointmentsRepository from '../repositories/AppointmentsRepository';
 
 interface RequestDTO {
-  provider: string;
+  providerId: string;
   date: Date;
 }
 
 class CreateAppointmentService {
-  public async execute({ provider, date }: RequestDTO): Promise<Appointment> {
+  public async execute({ providerId, date }: RequestDTO): Promise<Appointment> {
+    if (!providerId) {
+      throw new Error('The appointment must have a provider');
+    }
+
     const appointmentDate = startOfHour(date);
     const repository = getCustomRepository(AppointmentsRepository);
     const conflictingAppointment = await repository.findByDate(appointmentDate);
 
     if (conflictingAppointment) {
-      throw Error(
+      throw new Error(
         'The time of this appointment is not available. Please try another time.'
       );
     }
-    const appointment = repository.create({ provider, date: appointmentDate });
+    const appointment = repository.create({
+      providerId,
+      date: appointmentDate,
+    });
     await repository.save(appointment);
     return appointment;
   }
