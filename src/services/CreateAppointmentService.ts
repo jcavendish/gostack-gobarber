@@ -3,6 +3,7 @@ import { startOfHour } from 'date-fns';
 import { getCustomRepository } from 'typeorm';
 import Appointment from '../models/Appointment';
 import AppointmentsRepository from '../repositories/AppointmentsRepository';
+import AppError from '../errors/AppError';
 
 interface RequestDTO {
   providerId: string;
@@ -12,7 +13,7 @@ interface RequestDTO {
 class CreateAppointmentService {
   public async execute({ providerId, date }: RequestDTO): Promise<Appointment> {
     if (!providerId) {
-      throw new Error('The appointment must have a provider');
+      throw new AppError('The appointment must have a provider');
     }
 
     const appointmentDate = startOfHour(date);
@@ -20,7 +21,7 @@ class CreateAppointmentService {
     const conflictingAppointment = await repository.findByDate(appointmentDate);
 
     if (conflictingAppointment) {
-      throw new Error(
+      throw new AppError(
         'The time of this appointment is not available. Please try another time.'
       );
     }

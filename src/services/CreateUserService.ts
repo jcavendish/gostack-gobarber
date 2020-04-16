@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 import { hash } from 'bcryptjs';
 import User from '../models/Users';
+import AppError from '../errors/AppError';
 
 interface RequestDTO {
   name: string;
@@ -14,7 +15,7 @@ class CreateUserService {
     const conflictingEmail = await repository.findOne({ email });
 
     if (conflictingEmail) {
-      throw new Error('This e-mail is already in use.');
+      throw new AppError('This e-mail is already in use.');
     }
     const encryptedPassword = await hash(password, 8);
     const user = repository.create({
@@ -23,8 +24,6 @@ class CreateUserService {
       password: encryptedPassword,
     });
     await repository.save(user);
-
-    delete user.password;
 
     return user;
   }

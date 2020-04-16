@@ -3,6 +3,7 @@ import { compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import User from '../models/Users';
 import authConfig from '../config/auth';
+import AppError from '../errors/AppError';
 
 interface RequestDTO {
   email: string;
@@ -19,12 +20,12 @@ class AuthenticateService {
     const authenticatedUser = await getRepository(User).findOne({ email });
 
     if (!authenticatedUser) {
-      throw new Error('E-mail or password incorrect');
+      throw new AppError('E-mail or password incorrect');
     }
 
     const isPasswordValid = await compare(password, authenticatedUser.password);
     if (!isPasswordValid) {
-      throw new Error('E-mail or password incorrect');
+      throw new AppError('E-mail or password incorrect');
     }
 
     const { secret, expiresIn } = authConfig.jwt;
