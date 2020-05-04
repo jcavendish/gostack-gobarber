@@ -1,4 +1,3 @@
-import { getRepository } from 'typeorm';
 import { hash } from 'bcryptjs';
 import AppError from '@shared/errors/AppError';
 import { inject, injectable } from 'tsyringe';
@@ -19,19 +18,17 @@ class CreateUserService {
   ) {}
 
   public async execute({ name, email, password }: IRequest): Promise<User> {
-    const repository = getRepository(User);
     const conflictingEmail = await this.repository.findByEmail(email);
 
     if (conflictingEmail) {
       throw new AppError('This e-mail is already in use.');
     }
     const encryptedPassword = await hash(password, 8);
-    const user = repository.create({
+    const user = this.repository.create({
       name,
       email,
       password: encryptedPassword,
     });
-    await repository.save(user);
 
     return user;
   }
