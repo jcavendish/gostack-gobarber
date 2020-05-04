@@ -1,23 +1,30 @@
-import { getRepository } from 'typeorm';
 import { compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
-import User from '../models/Users';
-import authConfig from '../config/auth';
-import AppError from '../errors/AppError';
+import authConfig from '@config/auth';
+import AppError from '@shared/errors/AppError';
+import { inject, injectable } from 'tsyringe';
+import User from '../infra/typeorm/entities/Users';
+import IUsersRepository from '../repositories/IUsersRepository';
 
-interface RequestDTO {
+interface IRequest {
   email: string;
   password: string;
 }
 
-interface ResponseDTO {
+interface IResponse {
   user: User;
   token: string;
 }
 
+@injectable()
 class AuthenticateService {
-  public async execute({ email, password }: RequestDTO): Promise<ResponseDTO> {
-    const authenticatedUser = await getRepository(User).findOne({ email });
+  constructor(
+    @inject('UsersRepository')
+    private repository: IUsersRepository
+  ) {}
+
+  public async execute({ email, password }: IRequest): Promise<IResponse> {
+    const authenticatedUser = await this.repository.findByEmail(email);
 
     if (!authenticatedUser) {
       throw new AppError('E-mail or password incorrect');

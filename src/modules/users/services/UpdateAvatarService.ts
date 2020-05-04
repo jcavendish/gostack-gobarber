@@ -1,11 +1,12 @@
-import { getRepository } from 'typeorm';
 import path from 'path';
 import fs from 'fs';
-import User from '../models/Users';
-import uploadConfig from '../config/upload';
-import AppError from '../errors/AppError';
+import uploadConfig from '@config/upload';
+import AppError from '@shared/errors/AppError';
+import { inject, injectable } from 'tsyringe';
+import User from '../infra/typeorm/entities/Users';
+import IUsersRepository from '../repositories/IUsersRepository';
 
-interface RequestDTO {
+interface IRequest {
   userId: string;
   avatarFilename: string;
   avatarSize: number;
@@ -13,14 +14,19 @@ interface RequestDTO {
 
 const MAXIMUM_SIZE = 2_000_000;
 
+@injectable()
 class UpdateAvatarService {
+  constructor(
+    @inject('UsersRepository')
+    private repository: IUsersRepository
+  ) {}
+
   public async execute({
     userId,
     avatarFilename,
     avatarSize,
-  }: RequestDTO): Promise<User> {
-    const userRepository = getRepository(User);
-    const user = await userRepository.findOne({ id: userId });
+  }: IRequest): Promise<User> {
+    const user = await this.repository.findById(userId);
 
     if (!user) {
       throw new AppError('You must be authenticated', 401);
@@ -33,7 +39,7 @@ class UpdateAvatarService {
     this.deleteIfExists(user.avatar);
 
     user.avatar = avatarFilename;
-    await userRepository.save(user);
+    await this.repository.update(user);
 
     return user;
   }
