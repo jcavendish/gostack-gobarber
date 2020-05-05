@@ -8,6 +8,7 @@ class AuthenticateController {
     const authenticate = container.resolve(AuthenticateService);
 
     const { user, token } = await authenticate.execute({ email, password });
+    delete user.password;
     return response.json({ user, token });
   }
 }

@@ -1,8 +1,6 @@
-import path from 'path';
-import fs from 'fs';
-import uploadConfig from '@config/upload';
 import AppError from '@shared/errors/AppError';
 import { inject, injectable } from 'tsyringe';
+import IStorageProvider from '@shared/container/providers/StorageProvider/models/IStorageProvider';
 import User from '../infra/typeorm/entities/Users';
 import IUsersRepository from '../repositories/IUsersRepository';
 
@@ -18,7 +16,9 @@ const MAXIMUM_SIZE = 2_000_000;
 class UpdateAvatarService {
   constructor(
     @inject('UsersRepository')
-    private repository: IUsersRepository
+    private repository: IUsersRepository,
+    @inject('StorageProvider')
+    private storageProvider: IStorageProvider
   ) {}
 
   public async execute({
@@ -33,26 +33,19 @@ class UpdateAvatarService {
     }
 
     if (avatarSize > MAXIMUM_SIZE) {
-      throw new Error('The image is larger than the maximum size of 2MB');
+      throw new AppError('The image is larger than the maximum size of 2MB');
     }
 
-    this.deleteIfExists(user.avatar);
+    if (user.avatar) {
+      await this.storageProvider.deleteFile(user.avatar);
+    }
 
-    user.avatar = avatarFilename;
+    const fileName = await this.storageProvider.storeFile(avatarFilename);
+
+    user.avatar = fileName;
     await this.repository.update(user);
 
     return user;
-  }
-
-  private async deleteIfExists(avatar: string): Promise<void> {
-    if (avatar) {
-      const userAvatarFilePath = path.join(uploadConfig.directory, avatar);
-      const userAvatarExists = await fs.promises.stat(userAvatarFilePath);
-
-      if (userAvatarExists) {
-        await fs.promises.unlink(userAvatarFilePath);
-      }
-    }
   }
 }
 export default UpdateAvatarService;
