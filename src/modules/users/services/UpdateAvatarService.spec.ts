@@ -36,7 +36,7 @@ describe('UpdateAvatar', () => {
       storageProvider
     );
 
-    expect(
+    await expect(
       updateAvatar.execute({
         userId: 'non-existent-id',
         avatarFilename: 'avatar.jpg',
@@ -59,7 +59,7 @@ describe('UpdateAvatar', () => {
       password: '12345',
     });
 
-    expect(
+    await expect(
       updateAvatar.execute({
         userId: user.id,
         avatarFilename: 'avatar.jpg',
