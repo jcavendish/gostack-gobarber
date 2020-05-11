@@ -1,17 +1,21 @@
 import FakeStorageProvider from '@shared/container/providers/StorageProvider/fakes/FakeStorageProvider';
 import AppError from '@shared/errors/AppError';
+import IStorageProvider from '@shared/container/providers/StorageProvider/models/IStorageProvider';
 import FakeUsersRepository from '../repositories/FakeUsersRepository';
 import UpdateAvatarService from './UpdateAvatarService';
+import IUsersRepository from '../repositories/IUsersRepository';
+
+let userRepository: IUsersRepository;
+let storageProvider: IStorageProvider;
+let updateAvatar: UpdateAvatarService;
 
 describe('UpdateAvatar', () => {
+  beforeEach(() => {
+    userRepository = new FakeUsersRepository();
+    storageProvider = new FakeStorageProvider();
+    updateAvatar = new UpdateAvatarService(userRepository, storageProvider);
+  });
   it('should update user avatar', async () => {
-    const userRepository = new FakeUsersRepository();
-    const storageProvider = new FakeStorageProvider();
-    const updateAvatar = new UpdateAvatarService(
-      userRepository,
-      storageProvider
-    );
-
     const user = await userRepository.create({
       name: 'John Doe',
       email: 'johndoe@emai.com',
@@ -29,13 +33,6 @@ describe('UpdateAvatar', () => {
   });
 
   it('should not update when user not known', async () => {
-    const userRepository = new FakeUsersRepository();
-    const storageProvider = new FakeStorageProvider();
-    const updateAvatar = new UpdateAvatarService(
-      userRepository,
-      storageProvider
-    );
-
     await expect(
       updateAvatar.execute({
         userId: 'non-existent-id',
@@ -46,13 +43,6 @@ describe('UpdateAvatar', () => {
   });
 
   it('should not update user avatar when it is larger than 2_000_000', async () => {
-    const userRepository = new FakeUsersRepository();
-    const storageProvider = new FakeStorageProvider();
-    const updateAvatar = new UpdateAvatarService(
-      userRepository,
-      storageProvider
-    );
-
     const user = await userRepository.create({
       name: 'John Doe',
       email: 'johndoe@emai.com',
@@ -69,13 +59,6 @@ describe('UpdateAvatar', () => {
   });
 
   it('should update user avatar and delete old when it exists', async () => {
-    const userRepository = new FakeUsersRepository();
-    const storageProvider = new FakeStorageProvider();
-    const updateAvatar = new UpdateAvatarService(
-      userRepository,
-      storageProvider
-    );
-
     const deleteFile = jest.spyOn(storageProvider, 'deleteFile');
 
     const user = await userRepository.create({
