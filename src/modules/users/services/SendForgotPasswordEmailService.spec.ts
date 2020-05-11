@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import AppError from '@shared/errors/AppError';
 import IEmailProvider from '@shared/container/providers/EmailProvider/models/IEmailProvider';
 import SendForgotPasswordEmailService from './SendForgotPasswordEmailService';
@@ -32,20 +33,14 @@ describe('SendForgotPasswordEmail', () => {
       password: '123456',
     });
 
-    await sendForgotPasswordEmail.execute(
-      'johndoe@example.com',
-      'This is a password recover email'
-    );
+    await sendForgotPasswordEmail.execute('johndoe@example.com');
 
     expect(sendEmail).toHaveBeenCalled();
   });
 
   it('shoul not be able to recover a non-existent user password', async () => {
     await expect(
-      sendForgotPasswordEmail.execute(
-        'johndoe@example.com',
-        'This is a password recover email'
-      )
+      sendForgotPasswordEmail.execute('johndoe@example.com')
     ).rejects.toBeInstanceOf(AppError);
   });
 
@@ -58,10 +53,7 @@ describe('SendForgotPasswordEmail', () => {
       password: '123456',
     });
 
-    await sendForgotPasswordEmail.execute(
-      'johndoe@example.com',
-      'This is a password recover email'
-    );
+    await sendForgotPasswordEmail.execute('johndoe@example.com');
 
     expect(generate).toHaveBeenCalledWith(user.id);
   });

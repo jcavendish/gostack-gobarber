@@ -1,3 +1,4 @@
+import path from 'path';
 import AppError from '@shared/errors/AppError';
 import { injectable, inject } from 'tsyringe';
 import IEmailProvider from '../../../shared/container/providers/EmailProvider/models/IEmailProvider';
@@ -15,8 +16,8 @@ class SendForgotPasswordEmailService {
     private userTokensRepository: IUserTokensRepository
   ) {}
 
-  public async execute(to: string, body: string): Promise<void> {
-    const user = await this.usersRepository.findByEmail(to);
+  public async execute(email: string): Promise<void> {
+    const user = await this.usersRepository.findByEmail(email);
 
     if (!user) {
       throw new AppError('The user does not exist');
@@ -24,7 +25,28 @@ class SendForgotPasswordEmailService {
 
     const { token } = await this.userTokensRepository.generate(user.id);
 
-    await this.emailProvider.sendEmail(to, body, token);
+    const templateFile = path.resolve(
+      __dirname,
+      '..',
+      'views',
+      'forgot_password.hbs'
+    );
+
+    await this.emailProvider.sendEmail({
+      to: {
+        name: user.name,
+        email: user.email,
+      },
+      subject: '[GoBarber] Recuperação de senha',
+      templateData: {
+        file: templateFile,
+        variables: {
+          name: user.name,
+          link: `http://localhost:3000/reset?token=${token}`,
+          senderName: 'Equipe GoBarber',
+        },
+      },
+    });
   }
 }
 
