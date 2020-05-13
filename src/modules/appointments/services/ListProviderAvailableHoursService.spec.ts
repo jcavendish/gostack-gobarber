@@ -18,6 +18,7 @@ describe('ListProviderAvailableHours', () => {
     const promises = schedulesHours.map(scheduledHour =>
       appointmentsRepository.create({
         providerId: 'test-provider-1',
+        userId: 'test-user-id-1',
         date: new Date(2020, 4, 12, scheduledHour, 0, 0),
       })
     );
