@@ -3,9 +3,10 @@ import { uuid } from 'uuidv4';
 import IUserRepository from '@modules/users/repositories/IUsersRepository';
 import ICreateUserDTO from '@modules/users/dtos/ICreateUsersDTO';
 import User from '../infra/typeorm/entities/User';
+import IListProviderDTO from '../dtos/IListProviderDTO';
 
 class FakeUsersRepository implements IUserRepository {
-  private repository: User[];
+  protected repository: User[];
 
   constructor() {
     this.repository = [];
@@ -44,6 +45,12 @@ class FakeUsersRepository implements IUserRepository {
       return eachUser;
     });
     return user;
+  }
+
+  public async findAllProvidersExcept({
+    exceptedProviderId,
+  }: IListProviderDTO): Promise<User[]> {
+    return this.repository.filter(user => user.id !== exceptedProviderId);
   }
 }
 
