@@ -15,6 +15,10 @@ describe('ListProviderAvailableDates', () => {
   });
 
   it('should be able to list the dates where the provider has at least one availability', async () => {
+    jest
+      .spyOn(Date, 'now')
+      .mockImplementationOnce(() => new Date(2020, 4, 12).getTime());
+
     await appointmentsRepository.create({
       providerId: 'test-provider-1',
       userId: 'test-user-1',

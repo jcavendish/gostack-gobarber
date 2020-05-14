@@ -64,7 +64,8 @@ class ListProviderAvailableHoursService {
     const currentDate = new Date(Date.now());
 
     return arrayOfHours.map(hour => {
-      const isFutureDate = isAfter(hour, getHours(currentDate));
+      const requestedDate = new Date(year, month - 1, date, hour);
+      const isFutureDate = isAfter(requestedDate, currentDate);
 
       const available = isFutureDate && !lookUpAppointments[hour];
       return { hour, available };
