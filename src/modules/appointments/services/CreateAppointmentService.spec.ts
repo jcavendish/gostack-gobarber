@@ -1,17 +1,24 @@
 import { isEqual } from 'date-fns';
 import AppError from '@shared/errors/AppError';
 
+import INotificationsRepository from '@modules/notifications/repositories/INotificationsRepository';
+import FakeNotificationsRepository from '@modules/notifications/repositories/fakes/FakeNotificationsRepository';
 import FakeAppointmentsRepository from '../repositories/FakeAppointmentsRepository';
 import CreateAppointmentService from './CreateAppointmentService';
 import IAppointmentsRepository from '../repositories/IAppointmentsRepository';
 
-let appointmentRepository: IAppointmentsRepository;
+let appointmentsRepository: IAppointmentsRepository;
+let notificationsRepository: INotificationsRepository;
 let createAppointment: CreateAppointmentService;
 
 describe('CreateAppointment', () => {
   beforeEach(() => {
-    appointmentRepository = new FakeAppointmentsRepository();
-    createAppointment = new CreateAppointmentService(appointmentRepository);
+    appointmentsRepository = new FakeAppointmentsRepository();
+    notificationsRepository = new FakeNotificationsRepository();
+    createAppointment = new CreateAppointmentService(
+      appointmentsRepository,
+      notificationsRepository
+    );
   });
 
   it('Should be able to create an appointment', async () => {
@@ -29,6 +36,22 @@ describe('CreateAppointment', () => {
     expect(appointment.providerId).toBe('provider-id');
     expect(appointment.userId).toBe('user-id');
     expect(isEqual(appointment.date, new Date(2020, 4, 5, 10))).toBeTruthy();
+  });
+
+  it('Should be able to create a notification to the provider', async () => {
+    jest
+      .spyOn(Date, 'now')
+      .mockImplementationOnce(() => new Date(2020, 4, 5, 9).getTime());
+
+    const createNotification = jest.spyOn(notificationsRepository, 'create');
+
+    await createAppointment.execute({
+      providerId: 'provider-id',
+      userId: 'user-id',
+      date: new Date(2020, 4, 5, 10),
+    });
+
+    expect(createNotification).toBeCalled();
   });
 
   it('Should not be able to create an appointment with the same time', async () => {
