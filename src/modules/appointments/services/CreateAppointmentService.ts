@@ -58,6 +58,7 @@ class CreateAppointmentService {
         'The time of this appointment is not available. Please try another time.'
       );
     }
+
     const appointment = await this.repository.create({
       providerId,
       userId,
