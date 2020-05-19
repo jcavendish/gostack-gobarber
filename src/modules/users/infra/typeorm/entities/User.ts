@@ -37,7 +37,7 @@ class User {
     if (!this.avatar) {
       return null;
     }
-    return `${process.env.APP_API_URL}/files/${this.avatar}`;
+    return `${process.env.APP_AVATAR_URL}/${this.avatar}`;
   }
 }
 

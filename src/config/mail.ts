@@ -9,7 +9,7 @@ interface IMailConfig {
 }
 
 export default {
-  provider: process.env.APP_MAIL_PROVIDER || 'ethereal',
+  provider: process.env.EMAIL_DRIVER || 'ethereal',
   defaults: {
     from: {
       name: 'João Cavendish',
