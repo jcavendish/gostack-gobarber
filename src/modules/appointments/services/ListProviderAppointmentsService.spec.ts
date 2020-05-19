@@ -1,16 +1,21 @@
 import 'reflect-metadata';
+import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheProvider';
+import FakeCacheProvider from '@shared/container/providers/CacheProvider/fakes/FakeCacheProvider';
 import IAppointmentsRepository from '../repositories/IAppointmentsRepository';
 import FakeAppointmentsRepository from '../repositories/FakeAppointmentsRepository';
 import ListProviderAppointmentsService from './ListProviderAppointmentsService';
 
 let appointmentsRepository: IAppointmentsRepository;
+let cacheProvider: ICacheProvider;
 let listProviderAppointments: ListProviderAppointmentsService;
 
 describe('ListAppointmentsProvider', () => {
   beforeEach(async () => {
     appointmentsRepository = new FakeAppointmentsRepository();
+    cacheProvider = new FakeCacheProvider();
     listProviderAppointments = new ListProviderAppointmentsService(
-      appointmentsRepository
+      appointmentsRepository,
+      cacheProvider
     );
   });
 

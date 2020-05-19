@@ -1,11 +1,16 @@
 import 'reflect-metadata';
 import ListProvidersService from '@modules/appointments/services/ListProvidersService';
 import FakeUsersRepository from '@modules/users/repositories/FakeUsersRepository';
+import FakeCacheProvider from '@shared/container/providers/CacheProvider/fakes/FakeCacheProvider';
 
 describe('ListProviders', () => {
   it('should list all providers excepted signed in', async () => {
     const providersRepository = new FakeUsersRepository();
-    const listProviders = new ListProvidersService(providersRepository);
+    const cacheProvider = new FakeCacheProvider();
+    const listProviders = new ListProvidersService(
+      providersRepository,
+      cacheProvider
+    );
 
     const user1 = await providersRepository.create({
       name: 'John Doe',

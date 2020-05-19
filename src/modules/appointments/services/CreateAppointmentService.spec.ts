@@ -3,21 +3,26 @@ import AppError from '@shared/errors/AppError';
 
 import INotificationsRepository from '@modules/notifications/repositories/INotificationsRepository';
 import FakeNotificationsRepository from '@modules/notifications/repositories/fakes/FakeNotificationsRepository';
+import FakeCacheProvider from '@shared/container/providers/CacheProvider/fakes/FakeCacheProvider';
+import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheProvider';
 import FakeAppointmentsRepository from '../repositories/FakeAppointmentsRepository';
 import CreateAppointmentService from './CreateAppointmentService';
 import IAppointmentsRepository from '../repositories/IAppointmentsRepository';
 
 let appointmentsRepository: IAppointmentsRepository;
 let notificationsRepository: INotificationsRepository;
+let cacheProvider: ICacheProvider;
 let createAppointment: CreateAppointmentService;
 
 describe('CreateAppointment', () => {
   beforeEach(() => {
     appointmentsRepository = new FakeAppointmentsRepository();
     notificationsRepository = new FakeNotificationsRepository();
+    cacheProvider = new FakeCacheProvider();
     createAppointment = new CreateAppointmentService(
       appointmentsRepository,
-      notificationsRepository
+      notificationsRepository,
+      cacheProvider
     );
   });
 
