@@ -53,6 +53,7 @@ class CreateAppointmentService {
     }
 
     const conflictingAppointment = await this.repository.findByDate(
+      providerId,
       appointmentDate
     );
 

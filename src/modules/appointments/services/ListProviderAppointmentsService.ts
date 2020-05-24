@@ -1,5 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheProvider';
+import { classToClass } from 'class-transformer';
 import IAppointmentsRepository from '../repositories/IAppointmentsRepository';
 import Appointment from '../infra/typeorm/entities/Appointment';
 
@@ -32,12 +33,16 @@ class ListProviderAppointmentsService {
     );
 
     if (!appointments) {
-      appointments = await this.appointmentsRepository.findAllInDateByProvider({
-        providerId,
-        date,
-        month,
-        year,
-      });
+      const foundAppointments = await this.appointmentsRepository.findAllInDateByProvider(
+        {
+          providerId,
+          date,
+          month,
+          year,
+        }
+      );
+
+      appointments = classToClass(foundAppointments);
 
       await this.cacheProvider.save(cachekey, appointments);
     }
