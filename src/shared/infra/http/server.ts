@@ -17,9 +17,9 @@ import rateLimiter from './middlewares/rateLimiter';
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 app.use('/files', express.static(uploadConfig.uploadDirectory));
 app.use(rateLimiter);
-app.use(cors());
 
 app.use(routes);
 
