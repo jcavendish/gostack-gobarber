@@ -1,5 +1,5 @@
 # GoBarber
-This is a node.js typescript project idealized by Rocketseat to its students to develop along and learn backend concepts and development. Important concepts and designs are applied in this app.
+This is a project created to learn backend concepts and development in node.js and typescript. Important concepts and designs are applied in this app.
 
 GoBarber is a platform for connecting clients to barbers. The app offers an appointments scheduling manager to the professionals, where clients see their available time before scheduling.
 
